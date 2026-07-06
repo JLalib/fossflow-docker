@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  fossflow:
+    image: ghcr.io/fossflow/fossflow:latest
+    container_name: fossflow
+    environment:
+      - ENABLE_SERVER_STORAGE=true
+      - STORAGE_PATH=/data/diagrams
+      - ENABLE_GIT_BACKUP=false
+    volumes:
+      - ./data:/data
+    ports:
+      - "8177:8177"
+    restart: unless-stopped
