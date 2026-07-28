@@ -1,183 +1,192 @@
-# 🎨 FossFLOW con Docker - Diagramas Isométricos 3D
+# 📐 FossFLOW: Creador de diagramas isométricos autohospedado con Docker
 
-![FossFLOW Logo](https://github.com/fossflow/fossflow/raw/main/logo.png) <!-- Placeholder: Replace with actual logo if available -->
+[![GitHub](https://img.shields.io/badge/GitHub-Repositorio-blue)](https://github.com/JLalib/fossflow-docker) [![Docker](https://img.shields.io/badge/Docker-FossFLOW-blue)](https://hub.docker.com/r/stnsmith/fossflow) [![License](https://img.shields.io/badge/Licencia-MIT-green)](https://github.com/JLalib/fossflow-docker/blob/main/LICENSE)
 
-> **FossFLOW** es una aplicación web de código abierto para crear diagramas isométricos (3D-style) de infraestructuras directamente en el navegador. Este repositorio proporciona un `docker-compose.yml` y un `README.md` en español para desplegar FossFLOW fácilmente usando Docker.
+## 📋 Descripción general
 
-## 📖 Descripción
+FossFLOW es una herramienta open source para crear hermosos diagramas isométricos de infraestructura completamente gratis, sin dependencias cloud y sin límites de funcionalidades. Es la alternativa gratuita y self-hosted a Cloudcraft, permitiéndote visualizar arquitecturas de nube, infraestructura on-premise y diseños de red de forma clara y profesional.
 
-FossFLOW es una Progressive Web App (PWA) construida con React y basada en la librería Isoflow (fork de fosssflow). Funciona completamente en el navegador, incluso sin conexión, y prioriza la privacidad: los datos se guardan localmente (en `localStorage`) a menos que actives el almacenamiento en servidor.
+Este repositorio contiene la configuración necesaria para desplegar FossFLOW con Docker Compose, siguiendo el tutorial de Genbyte para dibujar tu infraestructura sin depender de servicios de pago.
 
-Este proyecto simplifica el despliegue de FossFLOW mediante Docker Compose, incluyendo la configuración necesaria para el almacenamiento en servidor y la desactivación de respaldos Git automáticos (si no los necesitas).
+## ✨ Características principales
 
-## 🚀 Características
+- **Diagramas isométricos drag-and-drop**: interfaz intuitiva, coloca componentes arrastrando y soltando
+- **PWA con soporte offline completo**: funciona sin conexión directamente desde el navegador
+- **Componentes pre-construidos**: AWS, Azure, GCP e infraestructura genérica, con biblioteca en crecimiento
+- **Importa tus propios íconos**: PNG, JPG y SVG personalizados, con escalado automático
+- **Auto-save cada 5 segundos**: tus cambios siempre guardados, nunca pierdes trabajo
+- **Export/Import JSON**: comparte diagramas, versiona y garantiza portabilidad total
+- **Almacenamiento en servidor**: los diagramas persisten en el filesystem del contenedor Docker, con soporte multi-dispositivo
+- **Hotkeys configurables**: perfiles QWERTY, SMNRCT o ninguno, para mayor eficiencia
+- **Dark mode + diseño responsive**: UI moderna adaptada a desktop, tablet y móvil
+- **Multi-idioma**: soporte i18n integrado
+- **MIT open source**: código abierto, gratuito y con comunidad activa
 
-- ✅ **Diagramas isométricos 3D**: Crea infraestructuras bonitas y técnicas en perspectiva.
-- ✅ **Autoguardado**: Guarda tu trabajo cada ~5 segundos.
-- ✅ **Soporte PWA**: Puedes "instalarla" como aplicación nativa en Mac/Linux (y móviles).
-- ✅ **Privacidad primero**: Por defecto, todo queda en tu navegador (localStorage).
-- ✅ **Importar/exportar JSON**: Ideal para compartir o retomar después.
-- ✅ **Guardado rápido de sesión**: Sin cuadros de diálogo pesados.
-- ✅ **Modo offline completo**.
-- ✅ **Almacenamiento en servidor opcional**: Cuando usas Docker y configuras `ENABLE_SERVER_STORAGE=true`.
+## 📋 Requisitos del sistema
 
-## 📋 Requisitos del Sistema
+- Docker y Docker Compose (opcional, solo para almacenamiento en servidor)
+- Al menos 256 MB de RAM (muy ligero)
+- 100 MB de espacio en disco para la imagen Docker
+- Puerto 80 disponible (o el que elijas) para el acceso web
+- Navegador moderno: Chrome, Edge, Firefox o Safari
+- Soporte para PWA si quieres instalarlo como app
 
-- [Docker Engine](https://www.docker.com/get-started) (versión 20.10 o superior)
-- [Docker Compose](https://docs.docker.com/compose/) (versión 2.0 o superior)
-- Una distribución Linux (Ubuntu/Debian/etc.)
-- Terminal y conexión a Internet
+💡 Ultra-ligero: FossFLOW funciona sin servidor usando el almacenamiento local del navegador; Docker es opcional y solo necesario para persistencia multi-dispositivo.
 
-## 🛠️ Instalación
+## 🐳 Instalación
 
-### Paso 1: Crear el archivo `docker-compose.yml`
+### Opción 1: Docker Compose (almacenamiento persistente, recomendado)
 
-Copia el siguiente contenido en un archivo llamado `docker-compose.yml`:
+Crea un archivo `docker-compose.yml` con el siguiente contenido:
 
 ```yaml
 version: '3.8'
 
 services:
   fossflow:
-    image: ghcr.io/fossflow/fossflow:latest
+    image: stnsmith/fossflow:latest
     container_name: fossflow
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./diagrams:/data/diagrams
     environment:
+      # Almacenamiento en servidor (recomendado)
       - ENABLE_SERVER_STORAGE=true
       - STORAGE_PATH=/data/diagrams
+      # Modo producción
+      - NODE_ENV=production
+      # Backup a Git (opcional)
       - ENABLE_GIT_BACKUP=false
-    volumes:
-      - ./data:/data
-    ports:
-      - "8177:8177"
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 80 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 ```
 
-### Paso 2: Crear el directorio de datos (opcional pero recomendado)
-
-```bash
-mkdir -p data
-```
-
-### Paso 3: Levantar el contenedor
+Luego, inicia el servicio:
 
 ```bash
 docker compose up -d
 ```
 
-Docker Compose descargará la imagen de FossFLOW y iniciará el contenedor con la configuración especificada.
-
-### Paso 4: Verificar el despliegue
+### Opción 2: Docker run simple (almacenamiento local del navegador)
 
 ```bash
-docker compose ps
+docker run -d \
+  --name fossflow \
+  --restart unless-stopped \
+  -p 80:80 \
+  -e ENABLE_SERVER_STORAGE=false \
+  stnsmith/fossflow:latest
 ```
 
-Deberías ver el contenedor `fossflow` en estado `Up`.
+### Acceder
 
-### Paso 5: Acceder a FossFLOW
+`http://localhost` - Dashboard de FossFLOW (o `http://localhost:PUERTO` si cambias el puerto)
 
-Abre tu navegador web y visita:
+## ⚙️ Configuración
 
-- Localmente: `http://localhost:8177/`
-- En tu servidor: `http://TU_IP_DEL_SERVIDOR:8177/`
+Antes de iniciar el contenedor, revisa estas variables en tu `docker-compose.yml`:
 
-## 🔧 Configuración
+1. **ENABLE_SERVER_STORAGE**: activa el almacenamiento persistente en el servidor (recomendado para multi-dispositivo)
+2. **STORAGE_PATH**: ruta interna donde se guardan los diagramas (por defecto: `/data/diagrams`)
+3. **NODE_ENV**: modo de ejecución, usa `production` para despliegues reales
+4. **ENABLE_GIT_BACKUP**: activa backup automático a un repositorio Git (opcional)
 
-### Variables de entorno
+💡 Consejo: si solo lo vas a usar en un dispositivo, puedes prescindir de Docker y usar la PWA directamente en el navegador con almacenamiento local.
 
-| Variable | Descripción | Valor por defecto |
-|----------|-------------|-------------------|
-| `ENABLE_SERVER_STORAGE` | Guarda diagramas en el servidor (no solo en el navegador) | `false` |
-| `STORAGE_PATH` | Ruta interna donde FossFLOW escribe los JSON | `/data/diagrams` |
-| `ENABLE_GIT_BACKUP` | Activa/desactiva el backup Git automático | `true` |
+## 🚀 Primeros pasos
 
-En el `docker-compose.yml` proporcionado:
-- `ENABLE_SERVER_STORAGE=true` → Los diagramas se guardan en tu servidor (en el volumen `./data`).
-- `STORAGE_PATH=/data/diagrams` → Los archivos JSON se almacenan en `./data/diagrams` en tu host.
-- `ENABLE_GIT_BACKUP=false` → Desactiva el backup Git automático (útil si no tienes un repositorio Git configurado).
+1. Asegúrate de tener Docker y Docker Compose instalados si quieres almacenamiento persistente
+2. Crea el `docker-compose.yml` y ejecuta `docker compose up -d`
+3. Abre tu navegador en `http://localhost`
+4. Verás el editor isométrico en blanco
+5. Explora los componentes disponibles en el panel izquierdo (AWS, Azure, GCP, genéricos)
+6. Crea tu primer diagrama:
+   - Arrastra componentes como "EC2", "RDS" o "S3" al canvas
+   - Posiciona los elementos en forma de arquitectura (web, app, datos)
+   - Añade conectores para dibujar las relaciones entre componentes
+7. Cambia a modo oscuro con el icono de luna arriba a la derecha
+8. Sube tus propios íconos personalizados desde "Upload Icon"
+9. Configura tus hotkeys favoritos en Settings → Hotkeys
+10. Exporta tu diagrama en JSON para compartirlo o guardarlo en control de versiones
+11. Instala FossFLOW como app nativa (PWA) desde el icono de instalación en la barra de URL
 
-### Volúmenes de persistencia
+## 💡 Casos de uso
 
-- `./data:/data` - Almacena los diagramas JSON y cualquier otro dato persistente.
+- **Arquitectos cloud**: diseña arquitecturas AWS, Azure o GCP sin pagar por Cloudcraft
+- **DevOps/SRE**: visualiza infraestructura para documentación y onboarding de equipos
+- **Documentación técnica**: diagramas profesionales para propuestas, presentaciones y wikis
+- **Design workshops**: colaboración mediante export/import JSON, iteración rápida
+- **Homelab**: documenta tu infraestructura personal de forma gratuita y offline
 
-### Puertos expuestos
+## 🔒 Acceso remoto seguro (opcional)
 
-- `8177:8177` - Interfaz web de FossFLOW.
+Si deseas acceder a FossFLOW desde fuera de tu red local de forma segura, puedes usar un proxy inverso como Caddy, Nginx Proxy Manager o Traefik para obtener un certificado gratuito de Let's Encrypt.
 
-## 📖 Uso básico
+### Configuración Caddyfile (ejemplo)
 
-Una vez que FossFLOW está en funcionamiento:
+```
+diagrams.tudominio.com {
+    reverse_proxy localhost:80
+}
+```
 
-1. Accede a `http://localhost:8177/` (o la IP de tu servidor) en tu navegador.
-2. Comienza a crear tu diagrama isométrico:
-   - Haz clic en el botón "+" para añadir iconos.
-   - Usa la herramienta de flecha para conectar elementos.
-   - Añade texto con la herramienta de texto.
-   - Usa cuadrados/rectangulares para agrupar o delimitar zonas.
-3. Tu trabajo se guardará automáticamente cada ~5 segundos.
-4. Para exportar tu diagrama:
-   - **Export as JSON**: Para guardar un proyecto editable.
-   - **Export as Compact JSON**: Versión más ligera del JSON.
-   - **Export as image**: Para obtener un PNG listo para documentación.
-   - **Open**: Para cargar un JSON previamente guardado.
+### Resultado
 
-## 📋 Mantenimiento
+Acceso mediante `https://diagrams.tudominio.com` con HTTPS automático.
 
-### Ver los logs
+📝 Nota importante: si usas Caddy con HTTPS, asegúrate de que el WebSocket esté habilitado en el proxy inverso.
+
+## 🛠️ Gestión y mantenimiento
+
+### Ver logs
 
 ```bash
 docker compose logs -f fossflow
 ```
 
+### Backup de diagramas
+
+```bash
+cp -r ./diagrams ./diagrams-backup-$(date +%Y%m%d)
+```
+
+### Restaurar un backup
+
+```bash
+rm -rf ./diagrams
+cp -r ./diagrams-backup-YYYYMMDD ./diagrams
+docker compose restart fossflow
+```
+
 ### Reiniciar el servicio
 
 ```bash
-docker compose restart
+docker compose restart fossflow
 ```
 
-### Actualizar FossFLOW
+### Actualizar a la última versión
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-### Copia de seguridad de los diagramas
-
-Simplemente copia el directorio `data`:
+### Monitorear consumo
 
 ```bash
-cp -r data ./backup/data-$(date +%Y%m%d)
+docker stats fossflow
+# Verás: mínimo CPU, ~50-100MB RAM
 ```
 
-### Restaurar la copia de seguridad
+## 📝 Licencia
 
-```bash
-cp -r ./backup/data-YYYYMMDD/* data/
-```
-
-## 🛡️ Seguridad
-
-- FossFLOW prioriza la privacidad: por defecto, todo se guarda en tu navegador.
-- Si habilitas `ENABLE_SERVER_STORAGE`, asegúrate de que el directorio `data` tenga los permisos adecuados y esté protegido si contiene información sensible.
-- Mantén actualizada la imagen de FossFLOW para obtener los últimos parches de seguridad.
-
-## 📚 Recursos adicionales
-
-- [Repositorio oficial de FossFLOW](https://github.com/fossflow/fossflow)
-- [Documentación de Isoflow](https://github.com/isovalent/isolation) (librería base)
-- [Guía de mejores prácticas para Docker](https://docs.docker.com/engine/security/#/docker-daemon-attack-surface)
-
-## 🙏 Créditos
-
-- Este `docker-compose.yml` y `README.md` fueron generados a partir del tutorial del blog de Genbyte: [Instalar FossFLOW con Docker: crea diagramas 3D isométricos tipo Excalidraw](https://genbyte.blogspot.com/2025/12/instalar-fossflow-con-docker-crea.html)
-- Desarrollado por la comunidad de FossFLOW.
-- Iconos e interfaz inspirados en Excalidraw y Isoflow.
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto se basa en [FossFLOW](https://github.com/stan-smith/FossFLOW), licenciado bajo MIT. La configuración y documentación proporcionada aquí está bajo la [MIT License](https://github.com/JLalib/fossflow-docker/blob/main/LICENSE).
 
 ---
 
-🚀 ¡Disfruta creando diagramas de infraestructura impresionantes con FossFLOW y Docker!
+> ✨ **Nota**: Este repositorio contiene la configuración Docker y documentación extraída del tutorial de Genbyte: <a href="https://genbyte.blogspot.com/2026/07/como-insatlar-fossflow-en-docker.html" target="_blank" rel="noopener noreferrer">Cómo instalar FossFLOW en Docker - Creador de diagramas isométricos autohospedado en Docker</a>
