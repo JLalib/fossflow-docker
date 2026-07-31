@@ -1,45 +1,45 @@
-# 📐 FossFLOW: Creador de diagramas isométricos autohospedado con Docker
-
-[![GitHub](https://img.shields.io/badge/GitHub-Repositorio-blue)](https://github.com/JLalib/fossflow-docker) [![Docker](https://img.shields.io/badge/Docker-FossFLOW-blue)](https://hub.docker.com/r/stnsmith/fossflow) [![License](https://img.shields.io/badge/Licencia-MIT-green)](https://github.com/JLalib/fossflow-docker/blob/main/LICENSE)
+# 🎨 FossFLOW Docker | [![GitHub](https://img.shields.io/badge/GitHub-fossflow--docker-blue?logo=github)](https://github.com/JLalib/fossflow-docker) [![Docker](https://img.shields.io/badge/Docker-stnsmith%2Ffossflow-blue?logo=docker)](https://hub.docker.com/r/stnsmith/fossflow) [![License](https://img.shields.io/badge/License-MIT-green)](https://opensource.org/licenses/MIT)
 
 ## 📋 Descripción general
 
-FossFLOW es una herramienta open source para crear hermosos diagramas isométricos de infraestructura completamente gratis, sin dependencias cloud y sin límites de funcionalidades. Es la alternativa gratuita y self-hosted a Cloudcraft, permitiéndote visualizar arquitecturas de nube, infraestructura on-premise y diseños de red de forma clara y profesional.
+FossFLOW es una herramienta **open source** para crear diagramas isométricos de infraestructura completamente gratis, sin dependencias cloud y sin límites de features. Es la alternativa gratuita y autohospedada a Cloudcraft, permitiéndote visualizar arquitecturas de nube, infraestructura on-premise y diseños de red de forma clara y profesional.
 
-Este repositorio contiene la configuración necesaria para desplegar FossFLOW con Docker Compose, siguiendo el tutorial de Genbyte para dibujar tu infraestructura sin depender de servicios de pago.
+Funciona como una **PWA (Progressive Web App)** moderna con soporte offline completo en el navegador. No requiere servidor para funciones básicas, pero ofrece almacenamiento en servidor Docker para persistencia entre dispositivos.
 
 ## ✨ Características principales
 
-- **Diagramas isométricos drag-and-drop**: interfaz intuitiva, coloca componentes arrastrando y soltando
-- **PWA con soporte offline completo**: funciona sin conexión directamente desde el navegador
-- **Componentes pre-construidos**: AWS, Azure, GCP e infraestructura genérica, con biblioteca en crecimiento
-- **Importa tus propios íconos**: PNG, JPG y SVG personalizados, con escalado automático
-- **Auto-save cada 5 segundos**: tus cambios siempre guardados, nunca pierdes trabajo
-- **Export/Import JSON**: comparte diagramas, versiona y garantiza portabilidad total
-- **Almacenamiento en servidor**: los diagramas persisten en el filesystem del contenedor Docker, con soporte multi-dispositivo
-- **Hotkeys configurables**: perfiles QWERTY, SMNRCT o ninguno, para mayor eficiencia
-- **Dark mode + diseño responsive**: UI moderna adaptada a desktop, tablet y móvil
-- **Multi-idioma**: soporte i18n integrado
-- **MIT open source**: código abierto, gratuito y con comunidad activa
+- 🎯 **Diagramas isométricos drag-and-drop** – Interfaz intuitiva con componentes arrastrables
+- 📱 **PWA con soporte offline** – Funciona completamente offline, instalable como app nativa
+- ☁️ **Componentes pre-built** – AWS, Azure, GCP, infraestructura genérica (biblioteca creciente)
+- 🖼️ **Importa tus propios íconos** – PNG, JPG, SVG con escalado automático
+- 🔄 **Toggle isométrico/plano** – Cambia vista según necesidad
+- 💾 **Auto-save cada 5 segundos** – Nunca pierdes trabajo
+- 📤 **Export/Import JSON** – Comparte diagramas, control de versiones, portabilidad
+- 🐳 **Almacenamiento en servidor Docker** – Diagramas persisten en filesystem, multi-dispositivo
+- ⌨️ **Hotkeys configurables** – Perfiles QWERTY, SMNRCT, None
+- 🌙 **Dark mode + Responsive** – Desktop, tablet, móvil, accesible
+- 🌐 **Multi-idioma** – i18n integrado
+- ⚡ **Zero dependencies** – No requiere BD, Redis u otros servicios
+- 📄 **Open source MIT** – Código abierto, gratis, comunidad
 
 ## 📋 Requisitos del sistema
 
-- Docker y Docker Compose (opcional, solo para almacenamiento en servidor)
-- Al menos 256 MB de RAM (muy ligero)
-- 100 MB de espacio en disco para la imagen Docker
-- Puerto 80 disponible (o el que elijas) para el acceso web
-- Navegador moderno: Chrome, Edge, Firefox o Safari
-- Soporte para PWA si quieres instalarlo como app
+- Docker
+- Docker Compose (opcional, para almacenamiento servidor)
+- 256 MB RAM mínimo (muy ligero)
+- 100 MB espacio disco (para imagen Docker)
+- Puerto 80 o personalizado (para acceso web)
+- Navegador moderno: Chrome, Edge, Firefox, Safari
+- Soporte para PWA (requerido para instalación app)
 
-💡 Ultra-ligero: FossFLOW funciona sin servidor usando el almacenamiento local del navegador; Docker es opcional y solo necesario para persistencia multi-dispositivo.
+> **Ultra-ligero**: PWA funciona sin servidor. Docker opcional solo para persistencia multi-dispositivo.
 
 ## 🐳 Instalación
 
 ### Opción 1: Docker Compose (almacenamiento persistente, recomendado)
 
-Crea un archivo `docker-compose.yml` con el siguiente contenido:
-
-```yaml
+```bash
+cat > docker-compose.yml << 'EOF'
 version: '3.8'
 
 services:
@@ -64,15 +64,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-```
+EOF
 
-Luego, inicia el servicio:
-
-```bash
 docker compose up -d
 ```
 
-### Opción 2: Docker run simple (almacenamiento local del navegador)
+### Opción 2: Docker run simple (almacenamiento local navegador)
 
 ```bash
 docker run -d \
@@ -85,107 +82,83 @@ docker run -d \
 
 ### Acceder
 
-`http://localhost` - Dashboard de FossFLOW (o `http://localhost:PUERTO` si cambias el puerto)
+- **http://localhost** – Dashboard FossFLOW (o `http://localhost:PUERTO` si cambias el puerto)
 
 ## ⚙️ Configuración
 
-Antes de iniciar el contenedor, revisa estas variables en tu `docker-compose.yml`:
+Variables de entorno clave:
 
-1. **ENABLE_SERVER_STORAGE**: activa el almacenamiento persistente en el servidor (recomendado para multi-dispositivo)
-2. **STORAGE_PATH**: ruta interna donde se guardan los diagramas (por defecto: `/data/diagrams`)
-3. **NODE_ENV**: modo de ejecución, usa `production` para despliegues reales
-4. **ENABLE_GIT_BACKUP**: activa backup automático a un repositorio Git (opcional)
-
-💡 Consejo: si solo lo vas a usar en un dispositivo, puedes prescindir de Docker y usar la PWA directamente en el navegador con almacenamiento local.
+1. **ENABLE_SERVER_STORAGE** – `true` para almacenamiento en servidor (persistencia multi-dispositivo), `false` para solo localStorage del navegador
+2. **STORAGE_PATH** – Ruta dentro del contenedor donde guardar diagramas (ej: `/data/diagrams`)
+3. **NODE_ENV** – `production` para modo producción
+4. **ENABLE_GIT_BACKUP** – `true`/`false` para habilitar backup automático a Git (opcional)
 
 ## 🚀 Primeros pasos
 
-1. Asegúrate de tener Docker y Docker Compose instalados si quieres almacenamiento persistente
-2. Crea el `docker-compose.yml` y ejecuta `docker compose up -d`
-3. Abre tu navegador en `http://localhost`
-4. Verás el editor isométrico en blanco
-5. Explora los componentes disponibles en el panel izquierdo (AWS, Azure, GCP, genéricos)
-6. Crea tu primer diagrama:
-   - Arrastra componentes como "EC2", "RDS" o "S3" al canvas
-   - Posiciona los elementos en forma de arquitectura (web, app, datos)
-   - Añade conectores para dibujar las relaciones entre componentes
-7. Cambia a modo oscuro con el icono de luna arriba a la derecha
-8. Sube tus propios íconos personalizados desde "Upload Icon"
-9. Configura tus hotkeys favoritos en Settings → Hotkeys
-10. Exporta tu diagrama en JSON para compartirlo o guardarlo en control de versiones
-11. Instala FossFLOW como app nativa (PWA) desde el icono de instalación en la barra de URL
+1. **Explorar componentes disponibles** – Panel izquierdo: componentes (AWS, Azure, GCP, genéricos). Haz scroll para ver más. Click en componente para seleccionar, click en canvas para colocar.
+2. **Crear primer diagrama simple (ejemplo AWS)** – Busca "EC2" o "Lambda" en panel, arrastra al canvas. Arrastra "RDS" (database) y "S3" (storage). Click y arrastra elementos para mover. Posiciona en forma de arquitectura (tier: web, app, data).
+3. **Agregar conexiones** – Busca "Connector" o línea en panel. Dibuja líneas conectando componentes. Crea diagrama de arquitectura clara.
+4. **Cambiar tema (Dark mode)** – Click ícono luna (moon) arriba a la derecha. Toggle dark/light mode. Preferencia guardada.
+5. **Agregar tus propios íconos** – Click "Upload Icon" en panel. Selecciona PNG/JPG/SVG. El ícono aparece en diagrama. Toggle isométrico/plano si quieres.
+6. **Hotkeys configurables** – Settings (engranaje) → Hotkeys. Elige perfil: QWERTY (default), SMNRCT, None. Mejora velocidad dibujo.
+7. **Exportar diagrama (JSON)** – Menú superior → "Export". Descarga .json. Comparte con equipo o guarda en control de versiones.
+8. **Importar diagrama (JSON)** – Menú superior → "Import". Selecciona .json previamente exportado. Se carga automáticamente.
+9. **Instalar como PWA** – Barra de URL → icono instalación (o menú) → "Install app". Se instala como app nativa. Icono en desktop/dock. Funciona offline.
 
 ## 💡 Casos de uso
 
-- **Arquitectos cloud**: diseña arquitecturas AWS, Azure o GCP sin pagar por Cloudcraft
-- **DevOps/SRE**: visualiza infraestructura para documentación y onboarding de equipos
-- **Documentación técnica**: diagramas profesionales para propuestas, presentaciones y wikis
-- **Design workshops**: colaboración mediante export/import JSON, iteración rápida
-- **Homelab**: documenta tu infraestructura personal de forma gratuita y offline
+- 🏗️ **Arquitectos cloud** – Diseña AWS, Azure, GCP sin pagar Cloudcraft
+- ⚙️ **DevOps/SRE** – Visualiza infraestructura para documentación, onboarding
+- 📚 **Documentación técnica** – Hermosos diagramas para proposals, presentaciones, wikis
+- 🤝 **Design workshops** – Colaborativo (exporta/importa JSON). Iteración rápida
+- 🏠 **Homelab** – Documenta tu infraestructura personal. Offline. Gratis
 
-## 🔒 Acceso remoto seguro (opcional)
+## 🔒 Acceso remoto seguro
 
-Si deseas acceder a FossFLOW desde fuera de tu red local de forma segura, puedes usar un proxy inverso como Caddy, Nginx Proxy Manager o Traefik para obtener un certificado gratuito de Let's Encrypt.
-
-### Configuración Caddyfile (ejemplo)
-
-```
+```caddyfile
+# Caddyfile
 diagrams.tudominio.com {
     reverse_proxy localhost:80
 }
 ```
 
-### Resultado
+Acceso remoto seguro: **https://diagrams.tudominio.com** con HTTPS automático.
 
-Acceso mediante `https://diagrams.tudominio.com` con HTTPS automático.
-
-📝 Nota importante: si usas Caddy con HTTPS, asegúrate de que el WebSocket esté habilitado en el proxy inverso.
+> **Nota importante**: WebSocket requerido para HTTPS. Si usas Caddy con HTTPS, asegúrate que WebSocket está habilitado en reverse proxy.
 
 ## 🛠️ Gestión y mantenimiento
 
-### Ver logs
-
 ```bash
+# Ver logs
 docker compose logs -f fossflow
-```
 
-### Backup de diagramas
-
-```bash
+# Backup de diagramas
 cp -r ./diagrams ./diagrams-backup-$(date +%Y%m%d)
-```
 
-### Restaurar un backup
-
-```bash
+# Restore de backup
 rm -rf ./diagrams
 cp -r ./diagrams-backup-YYYYMMDD ./diagrams
 docker compose restart fossflow
-```
 
-### Reiniciar el servicio
-
-```bash
+# Reiniciar
 docker compose restart fossflow
-```
 
-### Actualizar a la última versión
-
-```bash
+# Actualizar a versión más reciente
 docker compose pull
 docker compose up -d
-```
 
-### Monitorear consumo
-
-```bash
+# Monitorear consumo
 docker stats fossflow
 # Verás: mínimo CPU, ~50-100MB RAM
+
+# Limpiar almacenamiento (opcional)
+du -sh ./diagrams
+# Ver tamaño total de diagramas almacenados
 ```
 
 ## 📝 Licencia
 
-Este proyecto se basa en [FossFLOW](https://github.com/stan-smith/FossFLOW), licenciado bajo MIT. La configuración y documentación proporcionada aquí está bajo la [MIT License](https://github.com/JLalib/fossflow-docker/blob/main/LICENSE).
+MIT License – Código abierto, gratis, comunidad. Ver [LICENSE](https://github.com/stan-smith/FossFLOW/blob/main/LICENSE) en el repositorio original.
 
 ---
 
